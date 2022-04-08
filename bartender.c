@@ -18,15 +18,40 @@
  * Code for bartender thread.
  * Do not touch.
  */
-void* bartender(void* args)
+int random_int(int min, int max)
+{
+	int s = min + rand() % (max + 1 - min);
+	return s;
+}
+void *bartender(void *args)
 {
 	int i;
-	for (i = 0; i<num_threads; i++)
+	for (i = 0; i < num_threads; i++)
 	{
 		waitForCustomer();
 		makeDrink();
 		receivePayment();
 	}
+	// int i;
+	// for (i = 0; i < num_threads; i++)
+	// {
+
+	// 	// sem_wait(&customer_outside);
+	// 	// printf("\t\t\t\t\t\t\t\t\t\t\t| %dBartender\n", i);
+	// 	// sleep(1);
+	// 	// sem_post(&bar_full);
+
+	// 	// sem_post(&bartender_available);
+
+	// 	// sem_post(&drink_made);
+	// 	// printf("\t\t\t\t\t\t\t\t\t\t\t| \t\t\t\tBartender\n");
+	// sleep(1);
+	// sem_wait(&c_paid);
+	// printf("\t\t\t\t\t\t\t\t\t\t\t| \t\t\t\t\t\tBartender\n");
+	// sleep(1);
+	// sem_wait(&customer_leaving);
+	//}
+
 	return NULL;
 }
 
@@ -35,10 +60,13 @@ void* bartender(void* args)
  */
 void waitForCustomer()
 {
-	//TODO - synchronize
+	sem_wait(&customer_outside);
 	printf("\t\t\t\t\t\t\t\t\t\t\t| Bartender\n");
-}
+	// sleep(1);
+	sem_post(&bar_full);
 
+	sem_post(&bartender_available);
+}
 
 /**
  * When a customer places an order it takes the Bartender
@@ -46,20 +74,21 @@ void waitForCustomer()
  */
 void makeDrink()
 {
-	//TODO - synchronize
+	sem_wait(&drink_ordered);
 	printf("\t\t\t\t\t\t\t\t\t\t\t| \t\tBartender\n");
+	int t = random_int(0, 3);
+	sleep(t);
 }
-
 
 /**
  * Gets payment from the correct customer
  */
 void receivePayment()
 {
-	//TODO - synchronize
-	//at the register waiting for customer to pay
+	sem_post(&drink_made);
 	printf("\t\t\t\t\t\t\t\t\t\t\t| \t\t\t\tBartender\n");
 
-	//got the payment from the right customer!
+	sem_wait(&c_paid);
 	printf("\t\t\t\t\t\t\t\t\t\t\t| \t\t\t\t\t\tBartender\n");
+	sleep(1);
 }
