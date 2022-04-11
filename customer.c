@@ -14,20 +14,15 @@
 #include "globals.h"
 #include "customer.h"
 
-int random_time(int min, int max)
-{
-	return min + rand() % (max + 1 - min);
-}
+// int random_time(int min, int max)
+// {
+// 	return min + rand() % (max + 1 - min);
+// }
 
 /**
  * This is what the thread will call.
  * Do not touch.
  */
-int random_intc(int min, int max)
-{
-	int s = min + rand() % (max + 1 - min);
-	return s;
-}
 void *customer(void *args)
 {
 	int custID = *(int *)args;
@@ -37,32 +32,6 @@ void *customer(void *args)
 	custBrowseArt(custID);
 	custAtRegister(custID);
 	custLeaveBar(custID);
-
-	// printf("Cust %d\t\t\t\t\t\t\t\t\t\t\t|\n", custID);
-
-	// int t = random_intc(3, 5);
-	// sleep(t);
-
-	// sem_post(&customer_outside);
-	// sem_wait(&bar_full);
-	// printf("\t\tCust %d\t\t\t\t\t\t\t\t\t|\n", custID);
-
-	// sem_wait(&bartender_available);
-	// sleep(1);
-	// sem_post(&drink_ordered);
-	// printf("\t\t\t\tCust %d\t\t\t\t\t\t\t|\n", custID);
-
-	// int art = random_intc(0, 3);
-	// sleep(art);
-	// printf("\t\t\t\t\t\tCust %d\t\t\t\t\t|\n", custID);
-	// // sleep(art);
-
-	// sem_wait(&drink_made);
-	// printf("\t\t\t\t\t\t\t\tCust %d\t\t\t|\n", custID);
-	//  sleep(1);
-	// sem_post(&c_paid);
-	// printf("\t\t\t\t\t\t\t\t\t\tCust %d\t|\n", custID);
-	//  sleep(1);
 	return NULL;
 }
 
@@ -72,9 +41,7 @@ void *customer(void *args)
 void custTravelToBar(int custID)
 {
 	printf("Cust %d\t\t\t\t\t\t\t\t\t\t\t|\n", custID);
-
-	int t = random_intc(0, 3);
-	sleep(t);
+	random_sleep(20, 5000);
 	sem_post(&customer_outside);
 }
 
@@ -84,10 +51,9 @@ void custTravelToBar(int custID)
  */
 void custArriveAtBar(int custID)
 {
-	sem_wait(&bar_full);
+	sem_wait(&bar_full); /*if theres already another customer in the bar, arriving thread must wait*/
 	printf("\t\tCust %d\t\t\t\t\t\t\t\t\t|\n", custID);
-
-	sem_wait(&bartender_available);
+	sem_wait(&bartender_available); 
 }
 
 /**
@@ -104,9 +70,8 @@ void custPlaceOrder(int custID)
  */
 void custBrowseArt(int custID)
 {
-	int art = random_intc(0, 3);
 	printf("\t\t\t\t\t\tCust %d\t\t\t\t\t|\n", custID);
-	sleep(art);
+	random_sleep(3, 4000);
 }
 
 /**

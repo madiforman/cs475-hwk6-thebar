@@ -1,10 +1,12 @@
 /*
- * TheBar.c
- *
- *  Created on: Dec 26, 2015
- *      Author: dchiu
+ ============================================================================
+ Name        : The Bar.C
+ Author      : Madison Sanchez-Forman
+ Version     : 4.11.22
+ Description : Uses semaphores to synchranize threads in a "bartender" and
+ "customer" scenario. Only one customer allowed in bar at a time.
+ ============================================================================
  */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -21,36 +23,32 @@ void cleanup();
 
 int main(int argc, char **argv)
 {
-	printBanner();
-	/// init(); // initialize semaphores
-	pthread_t b;
-	// pthread_t c;
+	if (argc != 2) /*if user didnt enter number of customers (threads)*/
+	{
+		printf("Usage: ./thebar <num threads>\n");
+		return 0;
+	}
 	num_threads = atoi(argv[1]);
-	// sem_open("/wait_outside", O_CREAT, 0600, 0);
-	//  sem_open("/mutex", O_CREAT, 0600, 1);
-	sem_open("/bar_full", O_CREAT, 0600, 0);
-	sem_open("/customer_outside", O_CREAT, 0600, 0);
-	sem_open("/bartender_available", O_CREAT, 0600, 0);
-	sem_open("/drink_ordered", O_CREAT, 0600, 0);
-	sem_open("/drink_made", O_CREAT, 0600, 0);
-	sem_open("/c_paid", O_CREAT, 0600, 0);
+	int i = 0, t_id[num_threads]; /*holds numbers to repersent which customer is running*/
+	srand(time(0));				  /*seed random at time 0 for different random numbers everytime program runs*/
+	printBanner();
+	init();		 /*initialize semaphores*/
+	pthread_t b; /*bartender thread*/
 
-	int i = 0;
-
-	int t_id[num_threads];
-
-	pthread_create(&b, NULL, bartender, NULL);
-	pthread_t *customers = (pthread_t *)malloc(num_threads * sizeof(pthread_t));
-	// printf("here\n");
+	pthread_t *customers = (pthread_t *)malloc(num_threads * sizeof(pthread_t)); /*customer threads*/
 	for (i = 0; i < num_threads; i++)
 	{
 		t_id[i] = i;
 	}
+	// TODO - fire off customer thread(s)
 	for (i = 0; i < num_threads; i++)
 	{
 		pthread_create(&customers[i], NULL, customer, (void *)&t_id[i]);
 	}
+	// TODO - fire off bartender thread
+	pthread_create(&b, NULL, bartender, NULL);
 
+	// TODO - wait for all threads to finish
 	for (i = 0; i < num_threads; i++)
 	{
 		pthread_join(customers[i], NULL);
@@ -58,20 +56,7 @@ int main(int argc, char **argv)
 
 	pthread_join(b, NULL);
 
-	sem_unlink("/wait_outside");
-	sem_unlink("/bartender_awake");
-	sem_unlink("/drink_made");
-	sem_unlink("/c_paid");
-
-	sem_close(&drink_made);
-	sem_close(&c_paid);
-	// TODO - fire off customer thread
-
-	// TODO - fire off bartender thread
-
-	// TODO - wait for all threads to finish
-
-	// cleanup(); // cleanup and destroy semaphores
+	cleanup(); /*cleanup and destroy semaphores*/
 	return 0;
 }
 
@@ -94,23 +79,19 @@ void printBanner()
 void init()
 {
 	// TODO - unlink semaphores
-	// sem_unlink("/customer_traveling");
-	// sem_unlink("/customer_arrived");
-	// sem_unlink("/bar_open");
-	// sem_unlink("/drink_ordered");
-	// sem_unlink("/drink_made");
-	// sem_unlink("/customer_paid");
-	// sem_unlink("/payment_confirmed");
-	// sem_unlink("/customer_left");
+	sem_unlink("/bar_full");
+	sem_unlink("/customer_outside");
+	sem_unlink("/bartender_available");
+	sem_unlink("/drink_ordered");
+	sem_unlink("/drink_made");
+	sem_unlink("/c_paid");
 	// // TODO - create semaphores
-	// // customer_traveling = sem_open("/customer_traveling", O_CREAT, 0600, 0);
-	// customer_arrived = sem_open("/customer_arrived", O_CREAT, 0600, 0);
-	// bar_open = sem_open("/bar_open", O_CREAT, 0600, 0);
-	// drink_ordered = sem_open("/drink_ordered", O_CREAT, 0600, 0);
-	// drink_made = sem_open("/drink_made", O_CREAT, 0600, 0);
-	// customer_paid = sem_open("/customer_paid", O_CREAT, 0600, 0);
-	// payment_confirmed = sem_open("/payment_confirmed", O_CREAT, 0600, 0);
-	// customer_left = sem_open("/customer_left", O_CREAT, 0600, 0);
+	sem_open("/bar_full", O_CREAT, 0600, 0);
+	sem_open("/customer_outside", O_CREAT, 0600, 0);
+	sem_open("/bartender_available", O_CREAT, 0600, 0);
+	sem_open("/drink_ordered", O_CREAT, 0600, 0);
+	sem_open("/drink_made", O_CREAT, 0600, 0);
+	sem_open("/c_paid", O_CREAT, 0600, 0);
 }
 
 /**
@@ -119,21 +100,17 @@ void init()
 void cleanup()
 {
 	// TODO - close semaphores
-	// sem_close(customer_traveling);
-	// sem_close(customer_arrived);
-	// sem_close(bar_open);
-	// sem_close(drink_ordered);
-	// sem_close(drink_made);
-	// sem_close(customer_paid);
-	// sem_close(payment_confirmed);
-	// sem_close(customer_left);
-	// // TODO - delete semaphores
-	// //	sem_unlink("/customer_traveling");
-	// sem_unlink("/customer_arrived");
-	// sem_unlink("/bar_open");
-	// sem_unlink("/drink_ordered");
-	// sem_unlink("/drink_made");
-	// sem_unlink("/customer_paid");
-	// sem_unlink("/payment_confirmed");
-	// sem_unlink("/customer_left");
+	sem_close(&bar_full);
+	sem_close(&customer_outside);
+	sem_close(&bartender_available);
+	sem_close(&drink_ordered);
+	sem_close(&drink_made);
+	sem_close(&c_paid);
+	// TODO - delete semaphores
+	sem_unlink("/bar_full");
+	sem_unlink("/customer_outside");
+	sem_unlink("/bartender_available");
+	sem_unlink("/drink_ordered");
+	sem_unlink("/drink_made");
+	sem_unlink("/c_paid");
 }

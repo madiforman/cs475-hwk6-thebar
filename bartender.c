@@ -18,11 +18,6 @@
  * Code for bartender thread.
  * Do not touch.
  */
-int random_int(int min, int max)
-{
-	int s = min + rand() % (max + 1 - min);
-	return s;
-}
 void *bartender(void *args)
 {
 	int i;
@@ -32,29 +27,19 @@ void *bartender(void *args)
 		makeDrink();
 		receivePayment();
 	}
-	// int i;
-	// for (i = 0; i < num_threads; i++)
-	// {
-
-	// 	// sem_wait(&customer_outside);
-	// 	// printf("\t\t\t\t\t\t\t\t\t\t\t| %dBartender\n", i);
-	// 	// sleep(1);
-	// 	// sem_post(&bar_full);
-
-	// 	// sem_post(&bartender_available);
-
-	// 	// sem_post(&drink_made);
-	// 	// printf("\t\t\t\t\t\t\t\t\t\t\t| \t\t\t\tBartender\n");
-	// sleep(1);
-	// sem_wait(&c_paid);
-	// printf("\t\t\t\t\t\t\t\t\t\t\t| \t\t\t\t\t\tBartender\n");
-	// sleep(1);
-	// sem_wait(&customer_leaving);
-	//}
-
 	return NULL;
 }
-
+/**
+ * @brief used in customer and bartender .c files to make threads sleep for random amount of time between min and max microseconds
+ *
+ * @param min minimum sleep time
+ * @param max maximum sleep time
+ */
+void random_sleep(int min, int max)
+{
+	int i = min + rand() % (max + 1 - min);
+	usleep(i);
+}
 /**
  * Waits in a closet until a customer enters.
  */
@@ -76,8 +61,7 @@ void makeDrink()
 {
 	sem_wait(&drink_ordered);
 	printf("\t\t\t\t\t\t\t\t\t\t\t| \t\tBartender\n");
-	int t = random_int(0, 3);
-	sleep(t);
+	random_sleep(5, 1000);
 }
 
 /**
@@ -90,5 +74,4 @@ void receivePayment()
 
 	sem_wait(&c_paid);
 	printf("\t\t\t\t\t\t\t\t\t\t\t| \t\t\t\t\t\tBartender\n");
-	sleep(1);
 }
