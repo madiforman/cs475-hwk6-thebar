@@ -86,12 +86,12 @@ void init()
 	sem_unlink("/drink_made");
 	sem_unlink("/c_paid");
 	// // TODO - create semaphores
-	sem_open("/bar_full", O_CREAT, 0600, 0);
-	sem_open("/customer_outside", O_CREAT, 0600, 0);
-	sem_open("/bartender_available", O_CREAT, 0600, 0);
-	sem_open("/drink_ordered", O_CREAT, 0600, 0);
-	sem_open("/drink_made", O_CREAT, 0600, 0);
-	sem_open("/c_paid", O_CREAT, 0600, 0);
+	bar_full = sem_open("/bar_full", O_CREAT, 0600, 0);
+	customer_outside = sem_open("/customer_outside", O_CREAT, 0600, 0);
+	bartender_available = sem_open("/bartender_available", O_CREAT, 0600, 0);
+	drink_ordered = sem_open("/drink_ordered", O_CREAT, 0600, 0);
+	drink_made = sem_open("/drink_made", O_CREAT, 0600, 0);
+	c_paid = sem_open("/c_paid", O_CREAT, 0600, 0);
 }
 
 /**
@@ -100,12 +100,12 @@ void init()
 void cleanup()
 {
 	// TODO - close semaphores
-	sem_close(&bar_full);
-	sem_close(&customer_outside);
-	sem_close(&bartender_available);
-	sem_close(&drink_ordered);
-	sem_close(&drink_made);
-	sem_close(&c_paid);
+	sem_close(bar_full);
+	sem_close(customer_outside);
+	sem_close(bartender_available);
+	sem_close(drink_ordered);
+	sem_close(drink_made);
+	sem_close(c_paid);
 	// TODO - delete semaphores
 	sem_unlink("/bar_full");
 	sem_unlink("/customer_outside");

@@ -37,7 +37,7 @@ void *bartender(void *args)
  */
 void random_sleep(int min, int max)
 {
-	int i = min + rand() % (max + 1 - min);
+	int i = min + rand() % (min + 1 - max);
 	usleep(i);
 }
 /**
@@ -45,12 +45,10 @@ void random_sleep(int min, int max)
  */
 void waitForCustomer()
 {
-	sem_wait(&customer_outside);
+	sem_wait(customer_outside);
 	printf("\t\t\t\t\t\t\t\t\t\t\t| Bartender\n");
-	// sleep(1);
-	sem_post(&bar_full);
-
-	sem_post(&bartender_available);
+	sem_post(bar_full);
+	sem_post(bartender_available);
 }
 
 /**
@@ -59,9 +57,9 @@ void waitForCustomer()
  */
 void makeDrink()
 {
-	sem_wait(&drink_ordered);
+	sem_wait(drink_ordered);
 	printf("\t\t\t\t\t\t\t\t\t\t\t| \t\tBartender\n");
-	random_sleep(5, 1000);
+	random_sleep(5000, 1000000);
 }
 
 /**
@@ -69,9 +67,9 @@ void makeDrink()
  */
 void receivePayment()
 {
-	sem_post(&drink_made);
+	sem_post(drink_made);
 	printf("\t\t\t\t\t\t\t\t\t\t\t| \t\t\t\tBartender\n");
 
-	sem_wait(&c_paid);
+	sem_wait(c_paid);
 	printf("\t\t\t\t\t\t\t\t\t\t\t| \t\t\t\t\t\tBartender\n");
 }

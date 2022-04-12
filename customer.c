@@ -13,12 +13,6 @@
 #include <fcntl.h>
 #include "globals.h"
 #include "customer.h"
-
-// int random_time(int min, int max)
-// {
-// 	return min + rand() % (max + 1 - min);
-// }
-
 /**
  * This is what the thread will call.
  * Do not touch.
@@ -41,8 +35,8 @@ void *customer(void *args)
 void custTravelToBar(int custID)
 {
 	printf("Cust %d\t\t\t\t\t\t\t\t\t\t\t|\n", custID);
-	random_sleep(20, 5000);
-	sem_post(&customer_outside);
+	random_sleep(20000, 5000000);
+	sem_post(customer_outside);
 }
 
 /**
@@ -51,9 +45,9 @@ void custTravelToBar(int custID)
  */
 void custArriveAtBar(int custID)
 {
-	sem_wait(&bar_full); /*if theres already another customer in the bar, arriving thread must wait*/
+	sem_wait(bar_full); /*if theres already another customer in the bar, arriving thread must wait*/
 	printf("\t\tCust %d\t\t\t\t\t\t\t\t\t|\n", custID);
-	sem_wait(&bartender_available); 
+	sem_wait(bartender_available);
 }
 
 /**
@@ -61,7 +55,7 @@ void custArriveAtBar(int custID)
  */
 void custPlaceOrder(int custID)
 {
-	sem_post(&drink_ordered);
+	sem_post(drink_ordered);
 	printf("\t\t\t\tCust %d\t\t\t\t\t\t\t|\n", custID);
 }
 
@@ -71,7 +65,7 @@ void custPlaceOrder(int custID)
 void custBrowseArt(int custID)
 {
 	printf("\t\t\t\t\t\tCust %d\t\t\t\t\t|\n", custID);
-	random_sleep(3, 4000);
+	random_sleep(3000, 4000000);
 }
 
 /**
@@ -81,8 +75,8 @@ void custBrowseArt(int custID)
  */
 void custAtRegister(int custID)
 {
-	sem_wait(&drink_made);
 	printf("\t\t\t\t\t\t\t\tCust %d\t\t\t|\n", custID);
+	sem_wait(drink_made);
 }
 
 /**
@@ -90,6 +84,6 @@ void custAtRegister(int custID)
  */
 void custLeaveBar(int custID)
 {
-	sem_post(&c_paid);
 	printf("\t\t\t\t\t\t\t\t\t\tCust %d\t|\n", custID);
+	sem_post(c_paid);
 }
